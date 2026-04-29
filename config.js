@@ -37,16 +37,16 @@ const CONFIG = {
    * 각 시트에는 해당 군/유형의 공고만 입력
    */
   SHEETS: [
-    { branch: '육군 현역병', url: 'YOUR_ARMY_HYUNYEOK_CSV_URL' },
-    { branch: '육군 모집병', url: 'YOUR_ARMY_MOJIP_CSV_URL' },
-    { branch: '해군',       url: 'YOUR_NAVY_CSV_URL' },
-    { branch: '공군',       url: 'YOUR_AIRFORCE_CSV_URL' },
-    { branch: '해병대',     url: 'YOUR_MARINE_CSV_URL' },
-    { branch: '카투사',     url: 'YOUR_KATUSA_CSV_URL' },
+    { branch: '육군 현역병', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=141518284&single=true&output=csv' },
+    { branch: '육군 모집병', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=0&single=true&output=csv' },
+    { branch: '해군',       url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1514166856&single=true&output=csv' },
+    { branch: '공군',       url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=2043380112&single=true&output=csv' },
+    { branch: '해병대',     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1319193307&single=true&output=csv' },
+    { branch: '카투사',     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1720311161&single=true&output=csv' },
   ],
 
   // 테스트용 더미 데이터 사용 (실제 운영 시 false)
-  USE_DUMMY_DATA: true,
+  USE_DUMMY_DATA: false,
 
   // 지난 공고 자동 숨김 (신청 마감일 기준)
   HIDE_PAST_NOTICES: true,
