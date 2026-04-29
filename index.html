@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>군 입대 신청 모아보기</title>
-  <meta name="description" content="육군, 해군, 공군, 해병대, 카투사 입대 모집 공고를 한눈에" />
+  <meta name="description" content="육군·해군·공군·해병대·카투사 입영 정보를 한눈에 확인하세요." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
@@ -18,12 +18,12 @@
     </div>
   </header>
 
-  <!-- 면책 배너 -->
+  <!-- 면책 배너 (간결, 항상 노출) -->
   <div class="disclaimer-banner" role="alert">
     <span class="disclaimer-icon" aria-hidden="true">⚠️</span>
     <span class="disclaimer-text">
-      모든 정보는 <strong>참고용</strong>이며 실제와 다를 수 있습니다.
-      신청 전 반드시 <strong>공식 사이트</strong>에서 재확인하세요.
+      본 사이트는 <strong>비공식 정보 모음</strong>입니다.
+      실제 신청 전 반드시 <strong>공식 사이트</strong>에서 재확인하시기 바랍니다.
     </span>
   </div>
 
@@ -39,26 +39,17 @@
         <input type="search" id="searchInput" placeholder="병과 검색" autocomplete="off" />
       </div>
 
-      <!-- 군 필터 -->
+      <!-- 소속 필터 (6개) -->
       <div class="filter-group">
         <span class="filter-label">소속</span>
         <div class="chip-row" id="branchFilter" role="tablist">
           <button class="chip active" data-filter="branch" data-value="all" role="tab" aria-selected="true">전체</button>
-          <button class="chip" data-filter="branch" data-value="육군" role="tab">육군</button>
+          <button class="chip" data-filter="branch" data-value="육군 현역병" role="tab">육군 현역병</button>
+          <button class="chip" data-filter="branch" data-value="육군 모집병" role="tab">육군 모집병</button>
           <button class="chip" data-filter="branch" data-value="해군" role="tab">해군</button>
           <button class="chip" data-filter="branch" data-value="공군" role="tab">공군</button>
           <button class="chip" data-filter="branch" data-value="해병대" role="tab">해병대</button>
           <button class="chip" data-filter="branch" data-value="카투사" role="tab">카투사</button>
-        </div>
-      </div>
-
-      <!-- 병과 필터 -->
-      <div class="filter-group">
-        <span class="filter-label">구분</span>
-        <div class="chip-row" id="categoryFilter" role="tablist">
-          <button class="chip active" data-filter="category" data-value="all" role="tab" aria-selected="true">전체</button>
-          <button class="chip" data-filter="category" data-value="모집" role="tab">모집</button>
-          <button class="chip" data-filter="category" data-value="징집" role="tab">징집</button>
         </div>
       </div>
     </section>
@@ -87,12 +78,30 @@
     </div>
   </main>
 
+  <!-- 푸터: 정식 면책 고지 -->
   <footer class="site-footer">
-    <p class="footer-disclaimer-strong">
-      본 사이트는 공식 기관과 무관한 정보 모음 사이트입니다.
-    </p>
-    <p>본 사이트의 정보는 참고용이며, 정보의 정확성을 보장하지 않습니다.</p>
-    <p>본 사이트의 정보로 인한 손해에 대해 어떠한 책임도 지지 않습니다.</p>
+    <div class="footer-section">
+      <h4 class="footer-heading">면책 고지</h4>
+      <p>본 사이트(이하 '본 서비스')는 병무청을 비롯한 어떠한 정부 기관·군 기관과도 무관한 개인 운영 정보 모음 사이트입니다.</p>
+      <p>본 서비스에 게시된 모든 정보는 운영자가 공개된 자료를 토대로 정리한 <strong>참고용 정보</strong>이며, 정보의 정확성·완전성·최신성을 보장하지 않습니다.</p>
+      <p>실제 입영 신청은 반드시 <strong>각 군 모집 공식 홈페이지</strong> 및 <strong>병무청 공식 홈페이지(mma.go.kr)</strong>에서 직접 확인 후 진행하시기 바랍니다.</p>
+      <p>본 서비스의 정보를 신뢰하여 발생한 어떠한 직접·간접적 손해에 대해서도 운영자는 책임을 지지 않습니다.</p>
+    </div>
+
+    <div class="footer-section">
+      <h4 class="footer-heading">공식 사이트 안내</h4>
+      <ul class="footer-links">
+        <li><a href="https://www.mma.go.kr" target="_blank" rel="noopener noreferrer">병무청 (mma.go.kr)</a></li>
+        <li><a href="https://www.army.mil.kr" target="_blank" rel="noopener noreferrer">육군 (army.mil.kr)</a></li>
+        <li><a href="https://www.navy.mil.kr" target="_blank" rel="noopener noreferrer">해군 (navy.mil.kr)</a></li>
+        <li><a href="https://www.airforce.mil.kr" target="_blank" rel="noopener noreferrer">공군 (airforce.mil.kr)</a></li>
+        <li><a href="https://www.rokmc.mil.kr" target="_blank" rel="noopener noreferrer">해병대 (rokmc.mil.kr)</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-bottom">
+      <p>© 2026 ipdae.kr · 비공식 정보 모음 사이트</p>
+    </div>
   </footer>
 
   <script src="config.js"></script>
