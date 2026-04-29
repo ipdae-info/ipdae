@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>입영공고</title>
+  <meta name="description" content="육군, 해군, 공군, 해병대, 카투사 입대 모집 공고를 한눈에" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="header-inner">
+      <h1 class="site-title">입영공고</h1>
+      <p class="site-sub">육군 · 해군 · 공군 · 해병대 · 카투사</p>
+    </div>
+  </header>
+
+  <!-- 면책 배너 -->
+  <div class="disclaimer-banner" role="alert">
+    <span class="disclaimer-icon" aria-hidden="true">⚠️</span>
+    <span class="disclaimer-text">
+      모든 정보는 <strong>참고용</strong>이며 실제와 다를 수 있습니다.
+      신청 전 반드시 <strong>공식 사이트</strong>에서 재확인하세요.
+    </span>
+  </div>
+
+  <main class="container">
+    <!-- 필터 섹션 -->
+    <section class="filters" aria-label="필터">
+      <!-- 검색 -->
+      <div class="search-wrap">
+        <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <circle cx="11" cy="11" r="7"/>
+          <path d="m21 21-4.3-4.3"/>
+        </svg>
+        <input type="search" id="searchInput" placeholder="병과 검색" autocomplete="off" />
+      </div>
+
+      <!-- 군 필터 -->
+      <div class="filter-group">
+        <span class="filter-label">소속</span>
+        <div class="chip-row" id="branchFilter" role="tablist">
+          <button class="chip active" data-filter="branch" data-value="all" role="tab" aria-selected="true">전체</button>
+          <button class="chip" data-filter="branch" data-value="육군" role="tab">육군</button>
+          <button class="chip" data-filter="branch" data-value="해군" role="tab">해군</button>
+          <button class="chip" data-filter="branch" data-value="공군" role="tab">공군</button>
+          <button class="chip" data-filter="branch" data-value="해병대" role="tab">해병대</button>
+          <button class="chip" data-filter="branch" data-value="카투사" role="tab">카투사</button>
+        </div>
+      </div>
+
+      <!-- 병과 필터 -->
+      <div class="filter-group">
+        <span class="filter-label">구분</span>
+        <div class="chip-row" id="categoryFilter" role="tablist">
+          <button class="chip active" data-filter="category" data-value="all" role="tab" aria-selected="true">전체</button>
+          <button class="chip" data-filter="category" data-value="모집" role="tab">모집</button>
+          <button class="chip" data-filter="category" data-value="징집" role="tab">징집</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 결과 카운트 + 정렬 -->
+    <div class="result-bar">
+      <span class="result-count">총 <span id="visibleCount">0</span>건</span>
+      <div class="sort-toggle" role="tablist" aria-label="정렬 순서">
+        <button class="sort-btn active" data-sort="enlist" role="tab" aria-selected="true">입영일자순</button>
+        <button class="sort-btn" data-sort="apply" role="tab" aria-selected="false">신청일자순</button>
+      </div>
+    </div>
+
+    <!-- 카드 그리드 -->
+    <section class="card-grid" id="cardGrid" aria-live="polite">
+      <div class="loading-state" id="loadingState">
+        <div class="loader"></div>
+        <p>공고를 불러오는 중…</p>
+      </div>
+    </section>
+
+    <!-- 빈 상태 -->
+    <div class="empty-state" id="emptyState" hidden>
+      <h3>해당 조건의 공고가 없습니다</h3>
+      <p>다른 필터를 선택해 보세요</p>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <p class="footer-disclaimer-strong">
+      본 사이트는 공식 기관과 무관한 정보 모음 사이트입니다.
+    </p>
+    <p>본 사이트의 정보는 참고용이며, 정보의 정확성을 보장하지 않습니다.</p>
+    <p>본 사이트의 정보로 인한 손해에 대해 어떠한 책임도 지지 않습니다.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
