@@ -1,5 +1,5 @@
 /**
- * 군 입대 모집 공고 - Application Logic
+ * 군 입대 신청 모아보기 - Application Logic
  */
 
 // ===== 상태 =====
@@ -7,10 +7,9 @@ const state = {
   notices: [],
   filters: {
     branch: 'all',
-    category: 'all',
     search: '',
   },
-  sortBy: 'enlist',  // 'enlist' (입영일자순, 기본) 또는 'apply' (신청일자순)
+  sortBy: 'enlist',  // 기본: 입영일자순
 };
 
 // ===== DOM =====
@@ -20,7 +19,6 @@ const els = {
   empty: document.getElementById('emptyState'),
   search: document.getElementById('searchInput'),
   branchChips: document.querySelectorAll('#branchFilter .chip'),
-  categoryChips: document.querySelectorAll('#categoryFilter .chip'),
   sortBtns: document.querySelectorAll('.sort-btn'),
   visibleCount: document.getElementById('visibleCount'),
 };
@@ -41,32 +39,72 @@ async function init() {
   }
 }
 
-// ===== 데이터 로드 =====
+// ===== 데이터 로드 (여러 시트) =====
 async function loadNotices() {
-  if (CONFIG.USE_DUMMY_DATA || !CONFIG.SHEET_CSV_URL || CONFIG.SHEET_CSV_URL.includes('YOUR_PUBLISHED_CSV_URL')) {
-    console.warn('⚠️ 더미 데이터 사용 중. config.js에서 SHEET_CSV_URL을 설정하고 USE_DUMMY_DATA를 false로 바꾸세요.');
-    return Promise.resolve(DUMMY_DATA.map(normalize));
+  if (CONFIG.USE_DUMMY_DATA) {
+    console.warn('⚠️ 더미 데이터 사용 중. config.js에서 SHEETS의 url을 설정하고 USE_DUMMY_DATA를 false로 바꾸세요.');
+    return DUMMY_DATA.map(normalize);
   }
 
   const cached = getCache();
-  if (cached) return cached;
+  if (cached) return cached.map(normalize);
 
-  const res = await fetch(CONFIG.SHEET_CSV_URL);
-  if (!res.ok) throw new Error(`시트 로드 실패 (${res.status})`);
+  if (!Array.isArray(CONFIG.SHEETS) || CONFIG.SHEETS.length === 0) {
+    throw new Error('config.js의 SHEETS 배열이 비어있습니다.');
+  }
 
-  const text = await res.text();
-  const data = parseCSV(text).map(normalize);
+  // 각 시트 병렬 fetch
+  const results = await Promise.allSettled(
+    CONFIG.SHEETS.map(async (sheet) => {
+      // URL이 placeholder면 스킵
+      if (!sheet.url || sheet.url.includes('YOUR_') || !sheet.url.startsWith('http')) {
+        console.warn(`⚠️ ${sheet.branch} 시트 URL이 설정되지 않았습니다.`);
+        return [];
+      }
 
-  setCache(data);
-  return data;
+      try {
+        const res = await fetch(sheet.url);
+        if (!res.ok) {
+          console.error(`❌ ${sheet.branch} 시트 로드 실패 (${res.status})`);
+          return [];
+        }
+        const text = await res.text();
+        const rows = parseCSV(text);
+
+        // branch를 시트 정보로 자동 채움
+        return rows.map(row => ({
+          ...row,
+          branch: sheet.branch,
+        }));
+      } catch (err) {
+        console.error(`❌ ${sheet.branch} 시트 에러:`, err);
+        return [];
+      }
+    })
+  );
+
+  // 모든 결과 합치기 (실패한 시트는 무시)
+  const allRows = results.flatMap(r => r.status === 'fulfilled' ? r.value : []);
+
+  if (allRows.length === 0) {
+    console.warn('⚠️ 모든 시트가 비어있거나 로드에 실패했습니다.');
+  }
+
+  setCache(allRows);
+  return allRows.map(normalize);
 }
 
 // ===== CSV 파서 =====
 function parseCSV(text) {
+  if (!text || typeof text !== 'string') return [];
+
+  // BOM 제거 (Google Sheets가 종종 추가함)
+  text = text.replace(/^\uFEFF/, '');
+
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   if (lines.length < 2) return [];
 
-  const headers = parseCSVLine(lines[0]).map(h => h.trim());
+  const headers = parseCSVLine(lines[0]).map(h => h.trim().replace(/^\uFEFF/, ''));
 
   return lines.slice(1).map(line => {
     const values = parseCSVLine(line);
@@ -75,6 +113,9 @@ function parseCSV(text) {
       row[h] = (values[i] || '').trim();
     });
     return row;
+  }).filter(row => {
+    // 완전히 빈 행 제거
+    return Object.values(row).some(v => v && String(v).trim());
   });
 }
 
@@ -105,15 +146,16 @@ function parseCSVLine(line) {
 
 // ===== 데이터 정규화 =====
 function normalize(row) {
+  if (!row || typeof row !== 'object') row = {};
+
   return {
-    branch: row.branch || '',
-    category: row.category || '모집',
-    mos: row.mos || '',
-    applyStart: row.applyStart || '',
-    applyEnd: row.applyEnd || '',
-    enlistStart: row.enlistStart || '',
-    enlistEnd: row.enlistEnd || '',
-    link: row.link || '#',
+    branch: (row.branch || '').trim(),
+    mos: (row.mos || '').trim(),
+    applyStart: (row.applyStart || '').trim(),
+    applyEnd: (row.applyEnd || '').trim(),
+    enlistStart: (row.enlistStart || '').trim(),
+    enlistEnd: (row.enlistEnd || '').trim(),
+    link: (row.link || '#').trim(),
     _applyStartObj: parseDate(row.applyStart),
     _applyEndObj: parseDate(row.applyEnd) || parseDate(row.applyStart),
     _enlistStartObj: parseDate(row.enlistStart),
@@ -122,25 +164,24 @@ function normalize(row) {
 
 function parseDate(str) {
   if (!str) return null;
-  // YYYY.MM.DD, YYYY-MM-DD, YYYY/MM/DD
+  // YYYY.MM.DD
   let match = str.match(/(\d{4})[.\-\/](\d{1,2})[.\-\/](\d{1,2})/);
   if (match) {
     const [, y, m, d] = match;
     if (y === '0000') return null;
     return new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
   }
-  // YYYY.MM (일 없음) - 월 마지막 날로 처리 (마감 비교용)
+  // YYYY.MM (월 마지막 날로 처리)
   match = str.match(/(\d{4})[.\-\/](\d{1,2})/);
   if (match) {
     const [, y, m] = match;
     if (y === '0000') return null;
-    return new Date(parseInt(y), parseInt(m), 0); // 다음달 0일 = 이번달 마지막 날
+    return new Date(parseInt(y), parseInt(m), 0);
   }
   return null;
 }
 
 // ===== 날짜 범위 포맷 =====
-// 시작과 끝이 같거나 끝이 비어있으면 하나만, 다르면 "시작 ~ 끝"
 function formatDateRange(start, end) {
   if (!start) return '미정';
   if (!end || normalizeDate(start) === normalizeDate(end)) {
@@ -149,7 +190,6 @@ function formatDateRange(start, end) {
   return `${start} ~ ${end}`;
 }
 
-// 비교용 정규화 (구분자 통일)
 function normalizeDate(str) {
   return str.replace(/[\-\/]/g, '.').trim();
 }
@@ -161,7 +201,7 @@ function getCache() {
     if (!raw) return null;
     const { data, ts } = JSON.parse(raw);
     if (Date.now() - ts > CONFIG.CACHE_MINUTES * 60 * 1000) return null;
-    return data.map(normalize);
+    return data;
   } catch { return null; }
 }
 
@@ -191,19 +231,6 @@ function bindEvents() {
     });
   });
 
-  els.categoryChips.forEach(chip => {
-    chip.addEventListener('click', () => {
-      els.categoryChips.forEach(c => {
-        c.classList.remove('active');
-        c.setAttribute('aria-selected', 'false');
-      });
-      chip.classList.add('active');
-      chip.setAttribute('aria-selected', 'true');
-      state.filters.category = chip.dataset.value;
-      render();
-    });
-  });
-
   els.sortBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       els.sortBtns.forEach(b => {
@@ -225,31 +252,29 @@ function getFilteredNotices() {
 
   return state.notices
     .filter(n => {
-      // 지난 공고 숨김 (신청 마감일 기준, 마감 없으면 시작일 기준)
+      // mos가 없으면 유효하지 않은 행
+      if (!n.mos) return false;
+
+      // 지난 공고 숨김
       if (CONFIG.HIDE_PAST_NOTICES && n._applyEndObj) {
         if (n._applyEndObj < today) return false;
       }
 
-      // 군 필터
+      // 소속 필터
       if (state.filters.branch !== 'all' && n.branch !== state.filters.branch) return false;
-
-      // 구분 필터
-      if (state.filters.category !== 'all' && n.category !== state.filters.category) return false;
 
       // 검색
       if (state.filters.search) {
-        const haystack = `${n.branch} ${n.category} ${n.mos}`.toLowerCase();
+        const haystack = `${n.branch} ${n.mos}`.toLowerCase();
         if (!haystack.includes(state.filters.search)) return false;
       }
 
       return true;
     })
     .sort((a, b) => {
-      // 정렬 기준 선택: 입영 시작일 또는 신청 시작일
       const aDate = state.sortBy === 'enlist' ? a._enlistStartObj : a._applyStartObj;
       const bDate = state.sortBy === 'enlist' ? b._enlistStartObj : b._applyStartObj;
 
-      // 날짜 없는 항목은 뒤로
       if (!aDate && !bDate) return 0;
       if (!aDate) return 1;
       if (!bDate) return -1;
@@ -278,13 +303,11 @@ function render() {
 function renderCard(n, idx) {
   const isUrgent = isApplyUrgent(n._applyEndObj);
   const safeBranch = escapeHTML(n.branch);
-  const safeCategory = escapeHTML(n.category);
   const safeMos = escapeHTML(n.mos);
   const safeApply = escapeHTML(formatDateRange(n.applyStart, n.applyEnd));
   const safeEnlist = escapeHTML(formatDateRange(n.enlistStart, n.enlistEnd));
   const safeLink = n.link && n.link !== '#' ? escapeAttr(n.link) : '';
 
-  const isDraft = n.category === '징집';
   const linkAttrs = safeLink
     ? `href="${safeLink}" target="_blank" rel="noopener noreferrer"`
     : `href="#" onclick="event.preventDefault()"`;
@@ -293,7 +316,6 @@ function renderCard(n, idx) {
     <a class="card" data-branch="${safeBranch}" ${linkAttrs} style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
       <div class="card-header">
         <span class="branch-tag">${safeBranch}</span>
-        <span class="category-tag ${isDraft ? 'draft' : ''}">${safeCategory}</span>
       </div>
 
       <div class="card-mos">${safeMos}</div>
