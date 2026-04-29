@@ -36,10 +36,10 @@
 
 const CONFIG = {
   // Google Sheets CSV 게시 URL
-  SHEET_CSV_URL: 'YOUR_PUBLISHED_CSV_URL_HERE',
+  SHEET_CSV_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=0&single=true&output=csv',
 
   // 테스트용 더미 데이터 사용 (배포 시 false로)
-  USE_DUMMY_DATA: true,
+  USE_DUMMY_DATA: false,
 
   // 지난 공고 자동 숨김 (신청 마감일 또는 시작일 기준)
   HIDE_PAST_NOTICES: true,
