@@ -1,10 +1,9 @@
 /* ========================================
-   군 입대 모집 공고
-   Theme: White + Sky Blue (Clean & Readable)
+   군 입대 신청 모아보기
+   Theme: White + Sky Blue
    ======================================== */
 
 :root {
-  /* 색상 - 흰색 + 하늘색 */
   --bg: #f5fafd;
   --bg-card: #ffffff;
   --ink: #0f1e2e;
@@ -12,19 +11,14 @@
   --ink-mute: #7d8a9a;
   --line: #d8e6ef;
   --line-soft: #e8f0f6;
-
-  /* 하늘색 액센트 */
   --sky: #4ba3e0;
   --sky-deep: #2e7fb8;
   --sky-light: #e3f1fb;
   --sky-bg: #f0f7fc;
-
   --danger: #d94c4c;
 
-  /* 폰트 */
   --font-body: 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
 
-  /* 그림자 */
   --shadow-card: 0 2px 8px rgba(75, 163, 224, 0.08), 0 1px 2px rgba(15, 30, 46, 0.04);
   --shadow-hover: 0 8px 20px rgba(75, 163, 224, 0.18), 0 2px 4px rgba(15, 30, 46, 0.06);
 }
@@ -41,7 +35,6 @@ body {
   min-height: 100vh;
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 /* ========== HEADER ========== */
@@ -49,6 +42,27 @@ body {
   background: linear-gradient(180deg, #ffffff 0%, var(--sky-bg) 100%);
   border-bottom: 1px solid var(--line);
   padding: 36px 24px 32px;
+}
+
+.header-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.site-title {
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--ink);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.site-sub {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--sky-deep);
+  letter-spacing: 0.02em;
 }
 
 /* ========== DISCLAIMER BANNER ========== */
@@ -79,27 +93,6 @@ body {
 .disclaimer-text strong {
   font-weight: 700;
   color: #5c4000;
-}
-
-.header-inner {
-  max-width: 1280px;
-  margin: 0 auto;
-  text-align: center;
-}
-
-.site-title {
-  font-size: 36px;
-  font-weight: 800;
-  color: var(--ink);
-  letter-spacing: -0.02em;
-  margin-bottom: 8px;
-}
-
-.site-sub {
-  font-size: 16px;
-  font-weight: 500;
-  color: var(--sky-deep);
-  letter-spacing: 0.02em;
 }
 
 /* ========== CONTAINER ========== */
@@ -192,6 +185,7 @@ body {
   cursor: pointer;
   transition: all 0.15s ease;
   letter-spacing: -0.01em;
+  white-space: nowrap;
 }
 
 .chip:hover {
@@ -233,7 +227,6 @@ body {
   margin: 0 2px;
 }
 
-/* 정렬 토글 */
 .sort-toggle {
   display: inline-flex;
   background: var(--bg-card);
@@ -304,7 +297,6 @@ body {
   border-color: var(--sky);
 }
 
-/* 군별 좌측 상단 액센트 (작은 점) */
 .card-header {
   display: flex;
   align-items: center;
@@ -319,25 +311,13 @@ body {
   letter-spacing: -0.01em;
 }
 
-.card[data-branch="육군"] .branch-tag { color: #2d7a3a; }
+/* 군별 컬러 */
+.card[data-branch="육군 현역병"] .branch-tag { color: #2d7a3a; }
+.card[data-branch="육군 모집병"] .branch-tag { color: #4a8f2e; }
 .card[data-branch="해군"] .branch-tag { color: #1e5a8a; }
 .card[data-branch="공군"] .branch-tag { color: #2e7fb8; }
 .card[data-branch="해병대"] .branch-tag { color: #b8442a; }
 .card[data-branch="카투사"] .branch-tag { color: #4a5fa5; }
-
-.category-tag {
-  font-size: 12px;
-  font-weight: 700;
-  padding: 3px 10px;
-  border-radius: 6px;
-  background: var(--sky-light);
-  color: var(--sky-deep);
-}
-
-.category-tag.draft {
-  background: #fde8e8;
-  color: var(--danger);
-}
 
 .card-mos {
   font-size: 22px;
@@ -468,27 +448,77 @@ body {
   color: var(--ink-soft);
 }
 
-/* ========== FOOTER ========== */
+/* ========== FOOTER (정식 면책 고지) ========== */
 .site-footer {
   border-top: 1px solid var(--line);
   background: #ffffff;
-  padding: 24px 16px;
-  text-align: center;
-  margin-top: 40px;
+  padding: 40px 24px 32px;
+  margin-top: 60px;
 }
 
-.site-footer p {
+.footer-section {
+  max-width: 800px;
+  margin: 0 auto 24px;
+}
+
+.footer-heading {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--line-soft);
+  letter-spacing: -0.01em;
+}
+
+.footer-section p {
   font-size: 13px;
-  color: var(--ink-mute);
-  margin: 2px 0;
-  line-height: 1.6;
+  color: var(--ink-soft);
+  line-height: 1.7;
+  margin-bottom: 6px;
 }
 
-.footer-disclaimer-strong {
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  color: var(--ink-soft) !important;
-  margin-bottom: 6px !important;
+.footer-section p strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.footer-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding: 0;
+}
+
+.footer-links li {
+  font-size: 13px;
+}
+
+.footer-links a {
+  color: var(--sky-deep);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.footer-links a:hover {
+  color: var(--sky);
+  text-decoration: underline;
+}
+
+.footer-bottom {
+  max-width: 800px;
+  margin: 24px auto 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--line-soft);
+  text-align: center;
+}
+
+.footer-bottom p {
+  font-size: 12px;
+  color: var(--ink-mute);
+  letter-spacing: 0.02em;
 }
 
 /* ========== RESPONSIVE ========== */
@@ -497,7 +527,7 @@ body {
     padding: 28px 20px 24px;
   }
 
-  .site-title { font-size: 28px; }
+  .site-title { font-size: 26px; }
   .site-sub { font-size: 14px; }
 
   .disclaimer-banner {
@@ -542,11 +572,20 @@ body {
 
   .card { padding: 20px; }
   .card-mos { font-size: 20px; }
+
+  .site-footer {
+    padding: 32px 20px 24px;
+  }
 }
 
 @media (max-width: 480px) {
-  .site-title { font-size: 24px; }
+  .site-title { font-size: 22px; }
   .filter-label { font-size: 14px; }
   .card-mos { font-size: 19px; }
   .date-value { font-size: 15px; }
+
+  .footer-links {
+    flex-direction: column;
+    gap: 8px;
+  }
 }
