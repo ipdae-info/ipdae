@@ -338,6 +338,17 @@ function bindEvents() {
     });
   });
 
+  // 카드 클릭 (이벤트 위임)
+  els.grid.addEventListener('click', e => {
+    const cardEl = e.target.closest('.card');
+    if (!cardEl) return;
+    e.preventDefault();
+    const idx = parseInt(cardEl.dataset.idx, 10);
+    if (isNaN(idx)) return;
+    const group = state.filteredGroups?.[idx];
+    if (group) openModal(group);
+  });
+
   // 모달 닫기 이벤트
   els.modalClose.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -395,6 +406,9 @@ function render() {
   els.loading.style.display = 'none';
   els.visibleCount.textContent = filtered.length;
 
+  // 현재 필터된 그룹을 저장 (이벤트 위임용)
+  state.filteredGroups = filtered;
+
   if (filtered.length === 0) {
     els.grid.innerHTML = '';
     els.empty.hidden = false;
@@ -403,14 +417,6 @@ function render() {
 
   els.empty.hidden = true;
   els.grid.innerHTML = filtered.map((g, i) => renderCard(g, i)).join('');
-
-  // 카드 클릭 이벤트 바인딩
-  els.grid.querySelectorAll('.card').forEach((cardEl, idx) => {
-    cardEl.addEventListener('click', e => {
-      e.preventDefault();
-      openModal(filtered[idx]);
-    });
-  });
 }
 
 function renderCard(g, idx) {
@@ -438,7 +444,7 @@ function renderCard(g, idx) {
     : '';
 
   return `
-    <button type="button" class="card" data-branch="${safeBranch}" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
+    <button type="button" class="card" data-branch="${safeBranch}" data-idx="${idx}" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
       <div class="card-header">
         <span class="branch-tag">${safeBranch}</span>
         ${countBadge}
@@ -525,8 +531,8 @@ function openModal(group) {
   // 모달 표시
   els.modal.hidden = false;
   els.modalBackdrop.hidden = false;
-  els.modal.style.display = '';
-  els.modalBackdrop.style.display = '';
+  els.modalBackdrop.style.display = 'block';
+  els.modal.style.display = 'flex';
   document.body.classList.add('modal-open');
 }
 
