@@ -573,6 +573,19 @@ body.modal-open {
   font-size: 12px;
 }
 
+.detail-table .col-date {
+  white-space: nowrap;
+  font-weight: 600;
+  color: var(--sky-deep);
+  font-size: 13px;
+}
+
+.detail-table .col-items {
+  font-weight: 500;
+  line-height: 1.6;
+  word-break: keep-all;
+}
+
 /* 나열 형식 */
 .detail-inline {
   font-size: 15px;
