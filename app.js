@@ -7,8 +7,8 @@
 
 // ===== 상태 =====
 const state = {
-  rows: [],          // 원본 행들 (정규화됨)
-  groups: [],        // 그룹화된 카드 목록
+  groups: [],          // 그룹화된 카드 목록
+  filteredGroups: [],  // 현재 필터링된 그룹 (이벤트 위임용)
   filters: {
     branch: 'all',
     search: '',
@@ -44,7 +44,6 @@ async function init() {
 
   try {
     const data = await loadNotices();
-    state.rows = data;
     state.groups = groupRows(data);
     render();
   } catch (err) {
@@ -528,6 +527,10 @@ function openModal(group) {
     els.modalLink.style.display = 'none';
   }
 
+  // 스크롤바 폭 측정 → 화면 흔들림 방지
+  const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
+  document.documentElement.style.setProperty('--scrollbar-width', scrollbarWidth + 'px');
+
   // 모달 표시
   els.modal.hidden = false;
   els.modalBackdrop.hidden = false;
@@ -567,13 +570,12 @@ function renderSingleDetail(group, itemLabel) {
 }
 
 function renderTableView(group, itemLabel, allSameDates) {
-  // 모든 일정이 같으면 항목만 보여주는 간단한 표
+  // 모든 일정이 같으면 항목들을 한 줄에 콤마로 나열
   if (allSameDates) {
-    const rows = group.items.map(item => `
-      <tr>
-        <td>${escapeHTML(item.item || '-')}</td>
-      </tr>
-    `).join('');
+    const itemsList = group.items
+      .map(item => escapeHTML(item.item || ''))
+      .filter(Boolean)
+      .join(', ');
 
     return `
       <table class="detail-table">
@@ -582,7 +584,11 @@ function renderTableView(group, itemLabel, allSameDates) {
             <th>${escapeHTML(itemLabel)}</th>
           </tr>
         </thead>
-        <tbody>${rows}</tbody>
+        <tbody>
+          <tr>
+            <td class="col-items">${itemsList}</td>
+          </tr>
+        </tbody>
       </table>
     `;
   }
