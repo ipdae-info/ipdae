@@ -111,46 +111,30 @@ const CONFIG = {
 // 더미 데이터 (테스트용)
 // ============================================================
 const DUMMY_DATA = [
-  // ===== 육군 현역병 (지역 기반) =====
+  // ===== 육군 현역병 (지역별 - 여러 행 유지) =====
   { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '서울', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.06', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '경기북부', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.13', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '경기북부, 인천', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.13', enlistEnd: '', link: 'https://www.mma.go.kr/' },
   { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '경기남부', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.13', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '부산', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.20', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '대구', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.20', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '서울', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.10', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '경기', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.17', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-
-  // ===== 육군 모집병 (병과 기반) =====
-  { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '운전병', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '감시장비운용병', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '의무병', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '취사병', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G002', groupTitle: '2026년 8월 전문특기병', item: '어학병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.18', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G002', groupTitle: '2026년 8월 전문특기병', item: 'JSA경비병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.18', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-  { branch: '육군 모집병', group: 'G002', groupTitle: '2026년 8월 전문특기병', item: '의장병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.18', enlistEnd: '', link: 'https://www.mma.go.kr/' },
-
-  // ===== 해군 =====
-  { branch: '해군', group: 'G001', groupTitle: '2026년 8월 해군 일반기술병', item: '함정요원', applyStart: '2026.05.10', applyEnd: '2026.05.20', enlistStart: '2026.08.03', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-  { branch: '해군', group: 'G001', groupTitle: '2026년 8월 해군 일반기술병', item: '항공요원', applyStart: '2026.05.10', applyEnd: '2026.05.20', enlistStart: '2026.08.03', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-  { branch: '해군', group: 'G001', groupTitle: '2026년 8월 해군 일반기술병', item: '취사병', applyStart: '2026.05.10', applyEnd: '2026.05.20', enlistStart: '2026.08.03', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-  { branch: '해군', group: 'G002', groupTitle: '2026년 9월 해군 전문특기병', item: '잠수함 승조원', applyStart: '2026.05.25', applyEnd: '2026.06.05', enlistStart: '2026.09.01', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-  { branch: '해군', group: 'G002', groupTitle: '2026년 9월 해군 전문특기병', item: 'UDT/SEAL', applyStart: '2026.05.25', applyEnd: '2026.06.05', enlistStart: '2026.09.01', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-  { branch: '해군', group: 'G002', groupTitle: '2026년 9월 해군 전문특기병', item: 'SSU', applyStart: '2026.05.25', applyEnd: '2026.06.05', enlistStart: '2026.09.01', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
-
+  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '부산, 경남', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.20', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+  { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '대구, 경북', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.20', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+  { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '서울, 인천', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.10', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+  { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '경기, 강원', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.17', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+ 
+  // ===== 육군 모집병 (1행에 병과 콤마로 모두) =====
+  { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '운전, 감시장비운용, 의무, 취사, 군악', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+  { branch: '육군 모집병', group: 'G002', groupTitle: '2026년 8월 전문특기병', item: '어학병, JSA경비병, 의장병, 33경호병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.18', enlistEnd: '', link: 'https://www.mma.go.kr/' },
+ 
+  // ===== 해군 (1행에 병과 콤마로 모두) =====
+  { branch: '해군', group: 'G001', groupTitle: '2026년 8월 해군 일반기술병', item: '함정요원, 항공요원, 취사, 정비', applyStart: '2026.05.10', applyEnd: '2026.05.20', enlistStart: '2026.08.03', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
+  { branch: '해군', group: 'G002', groupTitle: '2026년 9월 해군 전문특기병', item: '잠수함 승조원, UDT/SEAL, SSU', applyStart: '2026.05.25', applyEnd: '2026.06.05', enlistStart: '2026.09.01', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
+ 
   // ===== 공군 =====
   { branch: '공군', group: 'G001', groupTitle: '2026년 7월 공군 일반기술병', item: '일반', applyStart: '2026.05', applyEnd: '2026.06', enlistStart: '2026.07', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '전자계산', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '의무', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '기계', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '차량운전', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '통신전자전기', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
-
+  { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '전자계산, 의무, 기계, 차량운전, 통신전자전기', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
+ 
   // ===== 해병대 =====
-  { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '일반보병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
-  { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '수색', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
-  { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '전차', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
-  { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '포병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
-
+  { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '일반보병, 수색, 전차, 포병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
+ 
   // ===== 카투사 =====
   { branch: '카투사', group: 'G001', groupTitle: '2027년 입영 KATUSA', item: 'KATUSA', applyStart: '2026.09.10', applyEnd: '2026.09.16', enlistStart: '2027.02', enlistEnd: '2027.11', link: 'https://www.mma.go.kr/' },
 ];
