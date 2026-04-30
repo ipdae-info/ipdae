@@ -291,8 +291,15 @@ function bindEvents() {
   });
 
   // 모달 닫기 이벤트
-  els.modalClose.addEventListener('click', closeModal);
+  els.modalClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    closeModal();
+  });
   els.modalBackdrop.addEventListener('click', closeModal);
+  // 모달 내부 클릭은 닫기 차단 (헤더 등 클릭 시 닫히지 않게)
+  els.modal.addEventListener('click', (e) => {
+    if (e.target === els.modal) closeModal();
+  });
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape' && !els.modal.hidden) closeModal();
   });
@@ -449,9 +456,12 @@ function openModal(group) {
   const itemLabel = sheetConfig?.itemLabel || '항목';
 
   // 항목별 일정이 모두 동일한지 확인 (단일 그룹인지 vs 항목별로 다른 그룹인지)
+  const first = group.items[0];
   const allSameDates = group.items.every(item =>
-    item.enlistStart === group.items[0].enlistStart &&
-    item.enlistEnd === group.items[0].enlistEnd
+    item.applyStart === first.applyStart &&
+    item.applyEnd === first.applyEnd &&
+    item.enlistStart === first.enlistStart &&
+    item.enlistEnd === first.enlistEnd
   );
 
   els.modalBody.innerHTML = renderModalBody(group, itemLabel, allSameDates);
