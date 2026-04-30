@@ -40,6 +40,8 @@ body {
 
 body.modal-open {
   overflow: hidden;
+  /* 스크롤바 사라지는 만큼 padding 보정 → 화면 흔들림 방지 */
+  padding-right: var(--scrollbar-width, 0px);
 }
 
 /* ========== HEADER ========== */
@@ -505,33 +507,6 @@ body.modal-open {
 
 .btn-primary:hover { background: var(--sky-deep); box-shadow: 0 4px 12px rgba(75, 163, 224, 0.4); }
 
-/* 모달 본문 - 표시 모드 토글 */
-.view-toggle {
-  display: inline-flex;
-  background: var(--bg);
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  padding: 3px;
-  gap: 2px;
-  margin-bottom: 16px;
-}
-
-.view-toggle-btn {
-  padding: 7px 14px;
-  font-family: var(--font-body);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-mute);
-  background: transparent;
-  border: none;
-  border-radius: 7px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-
-.view-toggle-btn:hover { color: var(--sky-deep); }
-.view-toggle-btn.active { background: var(--sky); color: #ffffff; }
-
 /* 표 형식 */
 .detail-table {
   width: 100%;
@@ -566,13 +541,6 @@ body.modal-open {
 .detail-table tbody tr:last-child td { border-bottom: none; }
 .detail-table tbody tr:hover { background: var(--sky-bg); }
 
-.detail-table .col-num {
-  width: 44px;
-  color: var(--ink-mute);
-  font-weight: 600;
-  font-size: 12px;
-}
-
 .detail-table .col-date {
   white-space: nowrap;
   font-weight: 600;
@@ -584,28 +552,6 @@ body.modal-open {
   font-weight: 500;
   line-height: 1.6;
   word-break: keep-all;
-}
-
-/* 나열 형식 */
-.detail-inline {
-  font-size: 15px;
-  line-height: 1.7;
-  color: var(--ink);
-  padding: 18px 20px;
-  background: var(--sky-bg);
-  border: 1px solid var(--line);
-  border-radius: 12px;
-}
-
-.detail-inline-label {
-  font-weight: 700;
-  color: var(--sky-deep);
-  margin-right: 8px;
-}
-
-.detail-inline-items {
-  font-weight: 500;
-  letter-spacing: -0.01em;
 }
 
 /* 단일 항목 (카투사 등) */
@@ -745,6 +691,4 @@ body.modal-open {
   .date-value { font-size: 15px; }
 
   .footer-links { flex-direction: column; gap: 8px; }
-
-  .detail-table .col-num { display: none; }
 }
