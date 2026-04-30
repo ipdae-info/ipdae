@@ -344,6 +344,10 @@ body.modal-open {
   color: var(--ink-soft);
 }
 
+.empty-state[hidden] {
+  display: none !important;
+}
+
 .empty-state h3 { font-size: 20px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
 .empty-state p { font-size: 15px; color: var(--ink-mute); }
 
@@ -370,6 +374,10 @@ body.modal-open {
   animation: fadeIn 0.2s ease;
 }
 
+.modal-backdrop[hidden] {
+  display: none !important;
+}
+
 @keyframes fadeIn {
   from { opacity: 0; }
   to { opacity: 1; }
@@ -384,6 +392,10 @@ body.modal-open {
   justify-content: center;
   padding: 20px;
   pointer-events: none;
+}
+
+.modal[hidden] {
+  display: none !important;
 }
 
 .modal-inner {
