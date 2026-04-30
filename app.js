@@ -191,6 +191,7 @@ function parseDate(str) {
 
 // ===== 행 → 그룹 변환 =====
 // 같은 (branch, group) 조합의 행들을 하나의 그룹으로 묶음
+// 그룹의 신청/입영 일자 범위는 항목들의 min~max로 자동 계산
 function groupRows(rows) {
   const map = new Map();
 
@@ -203,30 +204,78 @@ function groupRows(rows) {
       map.set(key, {
         branch: row.branch,
         groupId: row.group,
-        title: row.groupTitle || row.item,  // groupTitle 없으면 item을 제목으로
-        applyStart: row.applyStart,
-        applyEnd: row.applyEnd,
-        enlistStart: row.enlistStart,
-        enlistEnd: row.enlistEnd,
+        title: row.groupTitle || row.item,
         link: row.link,
-        _applyStartObj: row._applyStartObj,
-        _applyEndObj: row._applyEndObj,
-        _enlistStartObj: row._enlistStartObj,
         items: [],
       });
     }
 
     const group = map.get(key);
+    // link가 비어있던 그룹에 link 있는 행 추가되면 채움
+    if (!group.link && row.link) group.link = row.link;
+
     group.items.push({
       item: row.item,
       applyStart: row.applyStart,
       applyEnd: row.applyEnd,
       enlistStart: row.enlistStart,
       enlistEnd: row.enlistEnd,
+      _applyStartObj: row._applyStartObj,
+      _applyEndObj: row._applyEndObj,
+      _enlistStartObj: row._enlistStartObj,
     });
   });
 
-  return Array.from(map.values());
+  // 각 그룹의 통합 일자 범위 계산
+  const groups = Array.from(map.values());
+  groups.forEach(g => {
+    g.applyStart = computeMinDateStr(g.items, 'applyStart');
+    g.applyEnd = computeMaxDateStr(g.items, 'applyEnd', 'applyStart');
+    g.enlistStart = computeMinDateStr(g.items, 'enlistStart');
+    g.enlistEnd = computeMaxDateStr(g.items, 'enlistEnd', 'enlistStart');
+
+    // 정렬용 Date 객체
+    g._applyStartObj = parseDate(g.applyStart);
+    g._applyEndObj = parseDate(g.applyEnd) || parseDate(g.applyStart);
+    g._enlistStartObj = parseDate(g.enlistStart);
+  });
+
+  return groups;
+}
+
+// 그룹 내 항목들에서 가장 빠른 날짜 문자열 반환
+function computeMinDateStr(items, field) {
+  let minDate = null;
+  let minStr = '';
+  items.forEach(item => {
+    const str = item[field];
+    if (!str) return;
+    const d = parseDate(str);
+    if (!d) return;
+    if (!minDate || d < minDate) {
+      minDate = d;
+      minStr = str;
+    }
+  });
+  return minStr;
+}
+
+// 그룹 내 항목들에서 가장 늦은 날짜 문자열 반환 (endField 우선, 없으면 startField)
+function computeMaxDateStr(items, endField, startField) {
+  let maxDate = null;
+  let maxStr = '';
+  items.forEach(item => {
+    // end 우선, 없으면 start 사용
+    const str = item[endField] || item[startField];
+    if (!str) return;
+    const d = parseDate(str);
+    if (!d) return;
+    if (!maxDate || d > maxDate) {
+      maxDate = d;
+      maxStr = str;
+    }
+  });
+  return maxStr;
 }
 
 // ===== 날짜 범위 포맷 =====
@@ -492,6 +541,8 @@ function openModal(group) {
   // 모달 표시
   els.modal.hidden = false;
   els.modalBackdrop.hidden = false;
+  els.modal.style.display = '';
+  els.modalBackdrop.style.display = '';
   document.body.classList.add('modal-open');
 }
 
@@ -571,26 +622,70 @@ function renderTableView(group, itemLabel, allSameDates) {
     `;
   }
 
-  // 일정이 다르면 일정 컬럼도 함께
-  const rows = group.items.map((item, i) => `
-    <tr>
-      <td class="col-num">${i + 1}</td>
-      <td>${escapeHTML(item.item || '-')}</td>
-      <td>${escapeHTML(formatDateRange(item.applyStart, item.applyEnd))}</td>
-      <td>${escapeHTML(formatDateRange(item.enlistStart, item.enlistEnd))}</td>
-    </tr>
-  `).join('');
+  // 일정이 다르면 같은 일정끼리 묶어서 표시
+  // 키: applyStart|applyEnd|enlistStart|enlistEnd
+  const dateGroups = new Map();
+  group.items.forEach(item => {
+    const key = `${item.applyStart}|${item.applyEnd}|${item.enlistStart}|${item.enlistEnd}`;
+    if (!dateGroups.has(key)) {
+      dateGroups.set(key, {
+        applyStart: item.applyStart,
+        applyEnd: item.applyEnd,
+        enlistStart: item.enlistStart,
+        enlistEnd: item.enlistEnd,
+        items: [],
+        _sortDate: item._applyStartObj,
+      });
+    }
+    dateGroups.get(key).items.push(item.item);
+  });
+
+  // 신청일자 빠른 순으로 정렬
+  const sortedDateGroups = Array.from(dateGroups.values()).sort((a, b) => {
+    if (!a._sortDate && !b._sortDate) return 0;
+    if (!a._sortDate) return 1;
+    if (!b._sortDate) return -1;
+    return a._sortDate - b._sortDate;
+  });
+
+  // 모든 항목의 입영일자가 동일한지 체크 (동일하면 입영일자 컬럼 생략)
+  const enlistDatesAllSame = sortedDateGroups.every(dg =>
+    dg.enlistStart === sortedDateGroups[0].enlistStart &&
+    dg.enlistEnd === sortedDateGroups[0].enlistEnd
+  );
+
+  // 헤더 구성
+  const headers = enlistDatesAllSame
+    ? `<th class="col-num">No.</th><th class="col-date">신청일자</th><th>${escapeHTML(itemLabel)}</th>`
+    : `<th class="col-num">No.</th><th class="col-date">신청일자</th><th class="col-date">입영일자</th><th>${escapeHTML(itemLabel)}</th>`;
+
+  const rows = sortedDateGroups.map((dg, i) => {
+    const applyText = escapeHTML(formatDateRange(dg.applyStart, dg.applyEnd));
+    const enlistText = escapeHTML(formatDateRange(dg.enlistStart, dg.enlistEnd));
+    const itemsList = dg.items.map(it => escapeHTML(it)).join(', ');
+
+    if (enlistDatesAllSame) {
+      return `
+        <tr>
+          <td class="col-num">${i + 1}</td>
+          <td class="col-date">${applyText}</td>
+          <td class="col-items">${itemsList}</td>
+        </tr>
+      `;
+    }
+    return `
+      <tr>
+        <td class="col-num">${i + 1}</td>
+        <td class="col-date">${applyText}</td>
+        <td class="col-date">${enlistText}</td>
+        <td class="col-items">${itemsList}</td>
+      </tr>
+    `;
+  }).join('');
 
   return `
     <table class="detail-table">
-      <thead>
-        <tr>
-          <th class="col-num">No.</th>
-          <th>${escapeHTML(itemLabel)}</th>
-          <th>신청일자</th>
-          <th>입영일자</th>
-        </tr>
-      </thead>
+      <thead><tr>${headers}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
   `;
@@ -610,6 +705,8 @@ function renderInlineView(group, itemLabel) {
 function closeModal() {
   els.modal.hidden = true;
   els.modalBackdrop.hidden = true;
+  els.modal.style.display = 'none';
+  els.modalBackdrop.style.display = 'none';
   document.body.classList.remove('modal-open');
 }
 
