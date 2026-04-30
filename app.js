@@ -14,7 +14,6 @@ const state = {
     search: '',
   },
   sortBy: 'enlist',
-  modalViewMode: 'table',  // 'table' or 'inline'
 };
 
 // ===== DOM =====
@@ -515,21 +514,6 @@ function openModal(group) {
 
   els.modalBody.innerHTML = renderModalBody(group, itemLabel, allSameDates);
 
-  // 항목이 1개면 토글 숨김 (의미 없음)
-  if (group.items.length <= 1) {
-    const toggle = els.modalBody.querySelector('.view-toggle');
-    if (toggle) toggle.style.display = 'none';
-  }
-
-  // 토글 버튼 이벤트
-  els.modalBody.querySelectorAll('.view-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.modalViewMode = btn.dataset.mode;
-      els.modalBody.innerHTML = renderModalBody(group, itemLabel, allSameDates);
-      bindViewToggle(group, itemLabel, allSameDates);
-    });
-  });
-
   // 푸터 링크
   if (group.link) {
     els.modalLink.href = group.link;
@@ -546,37 +530,14 @@ function openModal(group) {
   document.body.classList.add('modal-open');
 }
 
-function bindViewToggle(group, itemLabel, allSameDates) {
-  els.modalBody.querySelectorAll('.view-toggle-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      state.modalViewMode = btn.dataset.mode;
-      els.modalBody.innerHTML = renderModalBody(group, itemLabel, allSameDates);
-      bindViewToggle(group, itemLabel, allSameDates);
-    });
-  });
-}
-
 function renderModalBody(group, itemLabel, allSameDates) {
   // 항목이 1개거나 카투사처럼 단일 정보면 → 단일 정보 카드
   if (group.items.length === 1) {
     return renderSingleDetail(group, itemLabel);
   }
 
-  const tableActive = state.modalViewMode === 'table' ? 'active' : '';
-  const inlineActive = state.modalViewMode === 'inline' ? 'active' : '';
-
-  const toggle = `
-    <div class="view-toggle">
-      <button class="view-toggle-btn ${tableActive}" data-mode="table">표</button>
-      <button class="view-toggle-btn ${inlineActive}" data-mode="inline">나열</button>
-    </div>
-  `;
-
-  const content = state.modalViewMode === 'table'
-    ? renderTableView(group, itemLabel, allSameDates)
-    : renderInlineView(group, itemLabel);
-
-  return toggle + content;
+  // 항상 표 형식으로 표시
+  return renderTableView(group, itemLabel, allSameDates);
 }
 
 function renderSingleDetail(group, itemLabel) {
@@ -602,9 +563,8 @@ function renderSingleDetail(group, itemLabel) {
 function renderTableView(group, itemLabel, allSameDates) {
   // 모든 일정이 같으면 항목만 보여주는 간단한 표
   if (allSameDates) {
-    const rows = group.items.map((item, i) => `
+    const rows = group.items.map(item => `
       <tr>
-        <td class="col-num">${i + 1}</td>
         <td>${escapeHTML(item.item || '-')}</td>
       </tr>
     `).join('');
@@ -613,7 +573,6 @@ function renderTableView(group, itemLabel, allSameDates) {
       <table class="detail-table">
         <thead>
           <tr>
-            <th class="col-num">No.</th>
             <th>${escapeHTML(itemLabel)}</th>
           </tr>
         </thead>
@@ -623,7 +582,6 @@ function renderTableView(group, itemLabel, allSameDates) {
   }
 
   // 일정이 다르면 같은 일정끼리 묶어서 표시
-  // 키: applyStart|applyEnd|enlistStart|enlistEnd
   const dateGroups = new Map();
   group.items.forEach(item => {
     const key = `${item.applyStart}|${item.applyEnd}|${item.enlistStart}|${item.enlistEnd}`;
@@ -654,12 +612,12 @@ function renderTableView(group, itemLabel, allSameDates) {
     dg.enlistEnd === sortedDateGroups[0].enlistEnd
   );
 
-  // 헤더 구성
+  // 헤더 구성 (No. 컬럼 제거, 항목 컬럼이 먼저)
   const headers = enlistDatesAllSame
-    ? `<th class="col-num">No.</th><th class="col-date">신청일자</th><th>${escapeHTML(itemLabel)}</th>`
-    : `<th class="col-num">No.</th><th class="col-date">신청일자</th><th class="col-date">입영일자</th><th>${escapeHTML(itemLabel)}</th>`;
+    ? `<th>${escapeHTML(itemLabel)}</th><th class="col-date">신청일자</th>`
+    : `<th>${escapeHTML(itemLabel)}</th><th class="col-date">신청일자</th><th class="col-date">입영일자</th>`;
 
-  const rows = sortedDateGroups.map((dg, i) => {
+  const rows = sortedDateGroups.map(dg => {
     const applyText = escapeHTML(formatDateRange(dg.applyStart, dg.applyEnd));
     const enlistText = escapeHTML(formatDateRange(dg.enlistStart, dg.enlistEnd));
     const itemsList = dg.items.map(it => escapeHTML(it)).join(', ');
@@ -667,18 +625,16 @@ function renderTableView(group, itemLabel, allSameDates) {
     if (enlistDatesAllSame) {
       return `
         <tr>
-          <td class="col-num">${i + 1}</td>
-          <td class="col-date">${applyText}</td>
           <td class="col-items">${itemsList}</td>
+          <td class="col-date">${applyText}</td>
         </tr>
       `;
     }
     return `
       <tr>
-        <td class="col-num">${i + 1}</td>
+        <td class="col-items">${itemsList}</td>
         <td class="col-date">${applyText}</td>
         <td class="col-date">${enlistText}</td>
-        <td class="col-items">${itemsList}</td>
       </tr>
     `;
   }).join('');
@@ -688,17 +644,6 @@ function renderTableView(group, itemLabel, allSameDates) {
       <thead><tr>${headers}</tr></thead>
       <tbody>${rows}</tbody>
     </table>
-  `;
-}
-
-function renderInlineView(group, itemLabel) {
-  const items = group.items.map(i => escapeHTML(i.item)).filter(Boolean).join(', ');
-
-  return `
-    <div class="detail-inline">
-      <span class="detail-inline-label">${escapeHTML(itemLabel)}:</span>
-      <span class="detail-inline-items">${items}</span>
-    </div>
   `;
 }
 
