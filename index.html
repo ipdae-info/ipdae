@@ -18,7 +18,7 @@
     </div>
   </header>
 
-  <!-- 면책 배너 (간결, 항상 노출) -->
+  <!-- 면책 배너 -->
   <div class="disclaimer-banner" role="alert">
     <span class="disclaimer-icon" aria-hidden="true">⚠️</span>
     <span class="disclaimer-text">
@@ -30,16 +30,14 @@
   <main class="container">
     <!-- 필터 섹션 -->
     <section class="filters" aria-label="필터">
-      <!-- 검색 -->
       <div class="search-wrap">
         <svg class="search-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
           <circle cx="11" cy="11" r="7"/>
           <path d="m21 21-4.3-4.3"/>
         </svg>
-        <input type="search" id="searchInput" placeholder="병과 검색" autocomplete="off" />
+        <input type="search" id="searchInput" placeholder="병과·지역·공고명 검색" autocomplete="off" />
       </div>
 
-      <!-- 소속 필터 (6개) -->
       <div class="filter-group">
         <span class="filter-label">소속</span>
         <div class="chip-row" id="branchFilter" role="tablist">
@@ -54,7 +52,6 @@
       </div>
     </section>
 
-    <!-- 결과 카운트 + 정렬 -->
     <div class="result-bar">
       <span class="result-count">총 <span id="visibleCount">0</span>건</span>
       <div class="sort-toggle" role="tablist" aria-label="정렬 순서">
@@ -63,7 +60,6 @@
       </div>
     </div>
 
-    <!-- 카드 그리드 -->
     <section class="card-grid" id="cardGrid" aria-live="polite">
       <div class="loading-state" id="loadingState">
         <div class="loader"></div>
@@ -71,14 +67,46 @@
       </div>
     </section>
 
-    <!-- 빈 상태 -->
     <div class="empty-state" id="emptyState" hidden>
       <h3>해당 조건의 공고가 없습니다</h3>
       <p>다른 필터를 선택해 보세요</p>
     </div>
   </main>
 
-  <!-- 푸터: 정식 면책 고지 -->
+  <!-- 상세 모달 -->
+  <div class="modal-backdrop" id="modalBackdrop" hidden></div>
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle" hidden>
+    <div class="modal-inner">
+      <!-- 모달 헤더 -->
+      <div class="modal-header">
+        <div class="modal-header-text">
+          <span class="modal-branch" id="modalBranch"></span>
+          <h2 class="modal-title" id="modalTitle"></h2>
+          <p class="modal-meta" id="modalMeta"></p>
+        </div>
+        <button class="modal-close" id="modalClose" aria-label="닫기">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6 6 18M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+
+      <!-- 모달 본문 -->
+      <div class="modal-body" id="modalBody"></div>
+
+      <!-- 모달 푸터 -->
+      <div class="modal-footer">
+        <a class="btn-primary" id="modalLink" href="#" target="_blank" rel="noopener noreferrer">
+          병무청 공식 공지 바로가기
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M7 7h10v10M7 17 17 7"/>
+          </svg>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- 푸터 -->
   <footer class="site-footer">
     <div class="footer-section">
       <h4 class="footer-heading">면책 고지</h4>
