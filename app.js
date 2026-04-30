@@ -189,6 +189,7 @@ function parseDate(str) {
 
 // ===== 행 → 그룹 변환 =====
 // 같은 (branch, group) 조합의 행들을 하나의 그룹으로 묶음
+// 같은 group ID 안의 groupTitle과 link는 첫 번째 유효한 값으로 강제 통일됨
 // 그룹의 신청/입영 일자 범위는 항목들의 min~max로 자동 계산
 function groupRows(rows) {
   const map = new Map();
@@ -196,23 +197,29 @@ function groupRows(rows) {
   rows.forEach(row => {
     if (!row.item && !row.groupTitle) return;  // 유효하지 않은 행 제외
 
-    const key = `${row.branch}::${row.group || row.groupTitle || row.item}`;
+    // 그룹 키: branch + group ID
+    // group이 비어있으면 groupTitle/item을 폴백으로 사용
+    const groupKey = row.group || row.groupTitle || row.item;
+    const key = `${row.branch}::${groupKey}`;
 
     if (!map.has(key)) {
+      // 새 그룹 생성 (title/link는 빈 값이어도 일단 생성, 나중 행에서 보충 가능)
       map.set(key, {
         branch: row.branch,
         groupId: row.group,
-        title: row.groupTitle || row.item,
-        link: row.link,
+        title: row.groupTitle || '',
+        link: row.link || '',
+        _firstItem: row.item || '',  // 모든 행이 title 없을 때 폴백용
         items: [],
       });
+    } else {
+      // 기존 그룹: title과 link가 비어있으면 현재 행에서 보충 (첫 유효값 우선)
+      const group = map.get(key);
+      if (!group.title && row.groupTitle) group.title = row.groupTitle;
+      if (!group.link && row.link) group.link = row.link;
     }
 
-    const group = map.get(key);
-    // link가 비어있던 그룹에 link 있는 행 추가되면 채움
-    if (!group.link && row.link) group.link = row.link;
-
-    group.items.push({
+    map.get(key).items.push({
       item: row.item,
       applyStart: row.applyStart,
       applyEnd: row.applyEnd,
@@ -224,9 +231,13 @@ function groupRows(rows) {
     });
   });
 
-  // 각 그룹의 통합 일자 범위 계산
+  // 각 그룹의 통합 일자 범위 계산 + title 폴백 처리
   const groups = Array.from(map.values());
   groups.forEach(g => {
+    // 모든 행에서 groupTitle이 비어있으면 첫 item을 제목으로 사용
+    if (!g.title) g.title = g._firstItem;
+    delete g._firstItem;
+
     g.applyStart = computeMinDateStr(g.items, 'applyStart');
     g.applyEnd = computeMaxDateStr(g.items, 'applyEnd', 'applyStart');
     g.enlistStart = computeMinDateStr(g.items, 'enlistStart');
@@ -425,11 +436,20 @@ function renderCard(g, idx) {
   const safeApply = escapeHTML(formatDateRange(g.applyStart, g.applyEnd));
   const safeEnlist = escapeHTML(formatDateRange(g.enlistStart, g.enlistEnd));
 
-  // 카드 부제: 첫 항목 + (외 N개)
-  const itemsCount = g.items.length;
+  // 모든 item들을 콤마로 합친 뒤 다시 split (콤마 내부 항목까지 카운트)
+  // 예: items=["운전, 의무, 취사"] → ["운전","의무","취사"] (3개)
+  // 예: items=["서울","경기","부산"] → ["서울","경기","부산"] (3개)
+  const allItems = g.items
+    .map(it => it.item || '')
+    .join(', ')
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const itemsCount = allItems.length;
   let summary = '';
   if (itemsCount > 0) {
-    const firstItem = escapeHTML(g.items[0].item);
+    const firstItem = escapeHTML(allItems[0]);
     if (itemsCount > 1) {
       summary = `${firstItem} 외 ${itemsCount - 1}개`;
     } else {
@@ -439,7 +459,7 @@ function renderCard(g, idx) {
 
   // 항목 개수 뱃지
   const countBadge = itemsCount > 1
-    ? `<span class="count-badge">${itemsCount}개 항목</span>`
+    ? `<span class="count-badge">${itemsCount}개</span>`
     : '';
 
   return `
