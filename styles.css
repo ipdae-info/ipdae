@@ -258,6 +258,28 @@ body.modal-open {
   color: var(--sky-deep);
 }
 
+/* D-day 뱃지 */
+.dday-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+
+.dday-badge.dday-active {
+  background: #e8f5e9;
+  color: #2d7a3a;
+  border: 1px solid #a8d8b0;
+}
+
+.dday-badge.dday-upcoming {
+  background: var(--sky-light);
+  color: var(--sky-deep);
+  border: 1px solid #b8dcef;
+}
+
 /* 군별 컬러 */
 .card[data-branch="육군 현역병"] .branch-tag { color: #2d7a3a; }
 .card[data-branch="육군 모집병"] .branch-tag { color: #4a8f2e; }
@@ -554,6 +576,62 @@ body.modal-open {
   word-break: keep-all;
 }
 
+/* 항목 그리드 (모집병 등 - 칩으로 자동 정렬) */
+.detail-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  letter-spacing: -0.01em;
+}
+
+.detail-section-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 7px;
+  background: var(--sky-light);
+  color: var(--sky-deep);
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.item-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 8px;
+}
+
+.item-chip {
+  padding: 10px 14px;
+  background: var(--sky-bg);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--ink);
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: center;
+  word-break: keep-all;
+  line-height: 1.4;
+  transition: background 0.15s;
+}
+
+.item-chip:hover {
+  background: var(--sky-light);
+}
+
 /* 단일 항목 (카투사 등) */
 .detail-single {
   padding: 20px;
@@ -680,6 +758,16 @@ body.modal-open {
 
   .detail-table { font-size: 13px; }
   .detail-table th, .detail-table td { padding: 10px 10px; }
+
+  .item-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 6px;
+  }
+
+  .item-chip {
+    padding: 8px 10px;
+    font-size: 13px;
+  }
 
   .site-footer { padding: 32px 20px 24px; }
 }
