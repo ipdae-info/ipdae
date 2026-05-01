@@ -437,8 +437,6 @@ function renderCard(g, idx) {
   const safeEnlist = escapeHTML(formatDateRange(g.enlistStart, g.enlistEnd));
 
   // 모든 item들을 콤마로 합친 뒤 다시 split (콤마 내부 항목까지 카운트)
-  // 예: items=["운전, 의무, 취사"] → ["운전","의무","취사"] (3개)
-  // 예: items=["서울","경기","부산"] → ["서울","경기","부산"] (3개)
   const allItems = g.items
     .map(it => it.item || '')
     .join(', ')
@@ -457,16 +455,14 @@ function renderCard(g, idx) {
     }
   }
 
-  // 항목 개수 뱃지
-  const countBadge = itemsCount > 1
-    ? `<span class="count-badge">${itemsCount}개</span>`
-    : '';
+  // D-day 뱃지 (접수중 / D-N)
+  const dDayBadge = renderDdayBadge(g._applyStartObj, g._applyEndObj);
 
   return `
     <button type="button" class="card" data-branch="${safeBranch}" data-idx="${idx}" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
       <div class="card-header">
         <span class="branch-tag">${safeBranch}</span>
-        ${countBadge}
+        ${dDayBadge}
       </div>
 
       <div class="card-mos">${safeTitle}</div>
@@ -498,6 +494,34 @@ function isApplyUrgent(date) {
   today.setHours(0, 0, 0, 0);
   const diffDays = (date - today) / (1000 * 60 * 60 * 24);
   return diffDays >= 0 && diffDays <= 7;
+}
+
+// D-day 뱃지: 접수중 / D-N
+function renderDdayBadge(applyStartObj, applyEndObj) {
+  if (!applyStartObj) return '';
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const startDate = new Date(applyStartObj);
+  startDate.setHours(0, 0, 0, 0);
+
+  const endDate = applyEndObj ? new Date(applyEndObj) : startDate;
+  endDate.setHours(0, 0, 0, 0);
+
+  // 접수 중 (시작일 ≤ 오늘 ≤ 마감일)
+  if (today >= startDate && today <= endDate) {
+    return `<span class="dday-badge dday-active">접수중</span>`;
+  }
+
+  // 접수 시작 전 (오늘 < 시작일)
+  if (today < startDate) {
+    const diffDays = Math.ceil((startDate - today) / (1000 * 60 * 60 * 24));
+    return `<span class="dday-badge dday-upcoming">D-${diffDays}</span>`;
+  }
+
+  // 접수 마감 후 (지난 공고는 자동 숨김 처리되므로 거의 안 보이지만 안전장치)
+  return '';
 }
 
 function showError(msg) {
@@ -560,12 +584,16 @@ function openModal(group) {
 }
 
 function renderModalBody(group, itemLabel, allSameDates) {
-  // 항목이 1개거나 카투사처럼 단일 정보면 → 단일 정보 카드
+  // 항목이 1개고 콤마도 없으면 진짜 단일 정보 (예: 카투사)
   if (group.items.length === 1) {
-    return renderSingleDetail(group, itemLabel);
+    const itemText = group.items[0].item || '';
+    if (!itemText.includes(',')) {
+      return renderSingleDetail(group, itemLabel);
+    }
+    // 콤마가 있으면 모집병 같은 경우 → 그리드로 표시
   }
 
-  // 항상 표 형식으로 표시
+  // 표 형식으로 표시
   return renderTableView(group, itemLabel, allSameDates);
 }
 
@@ -590,26 +618,25 @@ function renderSingleDetail(group, itemLabel) {
 }
 
 function renderTableView(group, itemLabel, allSameDates) {
-  // 모든 일정이 같으면 항목들을 한 줄에 콤마로 나열
+  // 모든 일정이 같으면 항목들을 그리드 칩으로 표시
   if (allSameDates) {
-    const itemsList = group.items
-      .map(item => escapeHTML(item.item || ''))
-      .filter(Boolean)
-      .join(', ');
+    // 모든 행의 item을 합쳐서 콤마로 split
+    const allItems = group.items
+      .map(it => it.item || '')
+      .join(', ')
+      .split(',')
+      .map(s => s.trim())
+      .filter(Boolean);
+
+    const chips = allItems
+      .map(item => `<span class="item-chip">${escapeHTML(item)}</span>`)
+      .join('');
 
     return `
-      <table class="detail-table">
-        <thead>
-          <tr>
-            <th>${escapeHTML(itemLabel)}</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td class="col-items">${itemsList}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div class="detail-section">
+        <div class="detail-section-label">${escapeHTML(itemLabel)} <span class="detail-section-count">${allItems.length}</span></div>
+        <div class="item-grid">${chips}</div>
+      </div>
     `;
   }
 
