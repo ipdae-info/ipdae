@@ -436,13 +436,9 @@ function renderCard(g, idx) {
   const safeApply = escapeHTML(formatDateRange(g.applyStart, g.applyEnd));
   const safeEnlist = escapeHTML(formatDateRange(g.enlistStart, g.enlistEnd));
 
-  // 모든 item들을 콤마로 합친 뒤 다시 split (콤마 내부 항목까지 카운트)
-  const allItems = g.items
-    .map(it => it.item || '')
-    .join(', ')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
+  // 모든 item들을 합친 뒤 괄호 무시하고 split (예: "일반(가, 나), 수송" → 2개)
+  const combined = g.items.map(it => it.item || '').filter(Boolean).join(', ');
+  const allItems = splitItemsByComma(combined);
 
   const itemsCount = allItems.length;
   let summary = '';
@@ -620,13 +616,9 @@ function renderSingleDetail(group, itemLabel) {
 function renderTableView(group, itemLabel, allSameDates) {
   // 모든 일정이 같으면 항목들을 그리드 칩으로 표시
   if (allSameDates) {
-    // 모든 행의 item을 합쳐서 콤마로 split
-    const allItems = group.items
-      .map(it => it.item || '')
-      .join(', ')
-      .split(',')
-      .map(s => s.trim())
-      .filter(Boolean);
+    // 모든 행의 item을 합친 뒤 괄호 무시하고 split
+    const combined = group.items.map(it => it.item || '').filter(Boolean).join(', ');
+    const allItems = splitItemsByComma(combined);
 
     const chips = allItems
       .map(item => `<span class="item-chip">${escapeHTML(item)}</span>`)
@@ -723,4 +715,32 @@ function escapeHTML(str) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
+}
+
+// 괄호 내부 콤마를 무시하고 split
+// 예: "일반(일반, 갑판), 수송, 의무" → ["일반(일반, 갑판)", "수송", "의무"]
+function splitItemsByComma(text) {
+  if (!text) return [];
+  const result = [];
+  let buf = '';
+  let depth = 0;  // 괄호 중첩 깊이
+
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '(' || c === '[' || c === '{') {
+      depth++;
+      buf += c;
+    } else if (c === ')' || c === ']' || c === '}') {
+      depth = Math.max(0, depth - 1);
+      buf += c;
+    } else if (c === ',' && depth === 0) {
+      // 최상위 레벨의 콤마만 분리자로 사용
+      if (buf.trim()) result.push(buf.trim());
+      buf = '';
+    } else {
+      buf += c;
+    }
+  }
+  if (buf.trim()) result.push(buf.trim());
+  return result;
 }
