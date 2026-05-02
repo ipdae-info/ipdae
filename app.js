@@ -379,11 +379,18 @@ function getFilteredGroups() {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  // 마감 후 며칠까지 보여줄지 (config 값 또는 기본 14일)
+  const graceDays = typeof CONFIG.PAST_NOTICE_GRACE_DAYS === 'number'
+    ? CONFIG.PAST_NOTICE_GRACE_DAYS
+    : 14;
+  const gracePeriodMs = graceDays * 24 * 60 * 60 * 1000;
+
   return state.groups
     .filter(g => {
-      // 지난 공고 숨김
-      if (CONFIG.HIDE_PAST_NOTICES && g._applyEndObj) {
-        if (g._applyEndObj < today) return false;
+      // 마감 후 N일 지난 공고는 자동 숨김
+      if (g._applyEndObj) {
+        const elapsedMs = today - g._applyEndObj;
+        if (elapsedMs > gracePeriodMs) return false;
       }
 
       // 소속 필터
@@ -454,8 +461,11 @@ function renderCard(g, idx) {
   // D-day 뱃지 (접수중 / D-N)
   const dDayBadge = renderDdayBadge(g._applyStartObj, g._applyEndObj);
 
+  // 마감 상태 확인 (시각적 구분용)
+  const closedClass = isGroupClosed(g._applyEndObj) ? ' card-closed' : '';
+
   return `
-    <button type="button" class="card" data-branch="${safeBranch}" data-idx="${idx}" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
+    <button type="button" class="card${closedClass}" data-branch="${safeBranch}" data-idx="${idx}" style="animation-delay: ${Math.min(idx * 0.04, 0.4)}s">
       <div class="card-header">
         <span class="branch-tag">${safeBranch}</span>
         ${dDayBadge}
@@ -516,8 +526,18 @@ function renderDdayBadge(applyStartObj, applyEndObj) {
     return `<span class="dday-badge dday-upcoming">D-${diffDays}</span>`;
   }
 
-  // 접수 마감 후 (지난 공고는 자동 숨김 처리되므로 거의 안 보이지만 안전장치)
-  return '';
+  // 접수 마감 후 (마감 후 N일까지는 표시됨)
+  return `<span class="dday-badge dday-closed">마감</span>`;
+}
+
+// 그룹이 마감 상태인지 확인
+function isGroupClosed(applyEndObj) {
+  if (!applyEndObj) return false;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const endDate = new Date(applyEndObj);
+  endDate.setHours(0, 0, 0, 0);
+  return today > endDate;
 }
 
 function showError(msg) {
