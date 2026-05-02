@@ -280,6 +280,25 @@ body.modal-open {
   border: 1px solid #b8dcef;
 }
 
+.dday-badge.dday-closed {
+  background: #fde8e8;
+  color: #b8423a;
+  border: 1px solid #f0b8b3;
+}
+
+/* 마감된 카드 - 약간 흐리게 + 좌측 마커 */
+.card-closed {
+  opacity: 0.78;
+}
+
+.card-closed:hover {
+  opacity: 1;
+}
+
+.card-closed .card-mos {
+  color: var(--ink-soft);
+}
+
 /* 군별 컬러 */
 .card[data-branch="육군 현역병"] .branch-tag { color: #2d7a3a; }
 .card[data-branch="육군 모집병"] .branch-tag { color: #4a8f2e; }
