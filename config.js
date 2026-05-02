@@ -89,19 +89,20 @@ const CONFIG = {
    * 시트별 CSV URL 매핑
    */
   SHEETS: [
-    { branch: '육군 현역병', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=141518284&single=true&output=csv', itemLabel: '지역' },
-    { branch: '육군 모집병', url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=0&single=true&output=csv',    itemLabel: '병과' },
-    { branch: '해군',       url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1514166856&single=true&output=csv',           itemLabel: '병과' },
-    { branch: '공군',       url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=2043380112&single=true&output=csv',       itemLabel: '병과' },
-    { branch: '해병대',     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1319193307&single=true&output=csv',         itemLabel: '병과' },
-    { branch: '카투사',     url: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRGTB4lFRzCuCrEEc-csfbkaIYjFeHq3QBpjfpp-19BFqJj0R0CjnsD-g1REBC090IhchUIjFIClt25/pub?gid=1720311161&single=true&output=csv',         itemLabel: '구분' },
+    { branch: '육군 현역병', url: 'YOUR_ARMY_HYUNYEOK_CSV_URL', itemLabel: '지역' },
+    { branch: '육군 모집병', url: 'YOUR_ARMY_MOJIP_CSV_URL',    itemLabel: '병과' },
+    { branch: '해군',       url: 'YOUR_NAVY_CSV_URL',           itemLabel: '병과' },
+    { branch: '공군',       url: 'YOUR_AIRFORCE_CSV_URL',       itemLabel: '병과' },
+    { branch: '해병대',     url: 'YOUR_MARINE_CSV_URL',         itemLabel: '병과' },
+    { branch: '카투사',     url: 'YOUR_KATUSA_CSV_URL',         itemLabel: '구분' },
   ],
 
   // 테스트용 더미 데이터 사용 (실제 운영 시 false)
-  USE_DUMMY_DATA: false,
+  USE_DUMMY_DATA: true,
 
-  // 지난 공고 자동 숨김 (신청 마감일 기준)
-  HIDE_PAST_NOTICES: true,
+  // 마감 후 며칠까지 카드를 보여줄지 (마감 표시로 노출됨)
+  // 이 일수가 지나면 자동으로 숨겨짐
+  PAST_NOTICE_GRACE_DAYS: 14,
 
   // 캐시 시간 (분)
   CACHE_MINUTES: 5,
@@ -119,22 +120,22 @@ const DUMMY_DATA = [
   { branch: '육군 현역병', group: 'G001', groupTitle: '2026년 7월 본인선택 입영', item: '대구, 경북', applyStart: '2026.05.01', applyEnd: '2026.05.07', enlistStart: '2026.07.20', enlistEnd: '', link: 'https://www.mma.go.kr/' },
   { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '서울, 인천', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.10', enlistEnd: '', link: 'https://www.mma.go.kr/' },
   { branch: '육군 현역병', group: 'G002', groupTitle: '2026년 8월 본인선택 입영', item: '경기, 강원', applyStart: '2026.06.05', applyEnd: '2026.06.12', enlistStart: '2026.08.17', enlistEnd: '', link: 'https://www.mma.go.kr/' },
- 
+
   // ===== 육군 모집병 (1행에 병과 콤마로 모두) =====
   { branch: '육군 모집병', group: 'G001', groupTitle: '2026년 7월 기술행정병', item: '운전, 감시장비운용, 의무, 취사, 군악', applyStart: '2026.05.01', applyEnd: '2026.05.10', enlistStart: '2026.07.15', enlistEnd: '', link: 'https://www.mma.go.kr/' },
   { branch: '육군 모집병', group: 'G002', groupTitle: '2026년 8월 전문특기병', item: '어학병, JSA경비병, 의장병, 33경호병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.18', enlistEnd: '', link: 'https://www.mma.go.kr/' },
- 
+
   // ===== 해군 (1행에 병과 콤마로 모두) =====
   { branch: '해군', group: 'G001', groupTitle: '2026년 8월 해군 일반기술병', item: '함정요원, 항공요원, 취사, 정비', applyStart: '2026.05.10', applyEnd: '2026.05.20', enlistStart: '2026.08.03', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
   { branch: '해군', group: 'G002', groupTitle: '2026년 9월 해군 전문특기병', item: '잠수함 승조원, UDT/SEAL, SSU', applyStart: '2026.05.25', applyEnd: '2026.06.05', enlistStart: '2026.09.01', enlistEnd: '', link: 'https://www.navy.mil.kr/' },
- 
+
   // ===== 공군 =====
   { branch: '공군', group: 'G001', groupTitle: '2026년 7월 공군 일반기술병', item: '일반', applyStart: '2026.05', applyEnd: '2026.06', enlistStart: '2026.07', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
   { branch: '공군', group: 'G002', groupTitle: '2026년 8월 공군 전문기술병', item: '전자계산, 의무, 기계, 차량운전, 통신전자전기', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.08.25', enlistEnd: '', link: 'https://www.airforce.mil.kr/' },
- 
+
   // ===== 해병대 =====
   { branch: '해병대', group: 'G001', groupTitle: '2026년 9월 해병대 모집병', item: '일반보병, 수색, 전차, 포병', applyStart: '2026.06.01', applyEnd: '2026.06.10', enlistStart: '2026.09.10', enlistEnd: '', link: 'https://www.rokmc.mil.kr/' },
- 
+
   // ===== 카투사 =====
   { branch: '카투사', group: 'G001', groupTitle: '2027년 입영 KATUSA', item: 'KATUSA', applyStart: '2026.09.10', applyEnd: '2026.09.16', enlistStart: '2027.02', enlistEnd: '2027.11', link: 'https://www.mma.go.kr/' },
 ];
